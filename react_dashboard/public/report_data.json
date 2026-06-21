@@ -1,0 +1,958 @@
+{
+  "dataset_name": "network_log.csv",
+  "summary": {
+    "total_ips": 17,
+    "suspicious_ips": 14,
+    "normal_ips": 3,
+    "severity_distribution": {
+      "Critical": 2,
+      "High": 8,
+      "Medium": 4,
+      "Normal": 3
+    }
+  },
+  "hosts": [
+    {
+      "source_ip": "172.31.200.5",
+      "total_connections": 200,
+      "unique_destinations": 1,
+      "unique_ports": 1,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 50.25,
+      "conn_rate_per_sec": 3.98,
+      "peak_window_ips": 1,
+      "peak_window_ports": 1,
+      "peak_ports_per_ip": 1,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "CON": 200,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Backdoor)",
+      "is_suspicious": true,
+      "severity": "Critical",
+      "reason": "Labeled backdoor activity in dataset (200 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 200,
+      "true_attack_cat": "backdoor"
+    },
+    {
+      "source_ip": "10.88.0.15",
+      "total_connections": 180,
+      "unique_destinations": 1,
+      "unique_ports": 1,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 54.0,
+      "conn_rate_per_sec": 3.33,
+      "peak_window_ips": 1,
+      "peak_window_ports": 1,
+      "peak_ports_per_ip": 1,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "CON": 180,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Backdoor)",
+      "is_suspicious": true,
+      "severity": "Critical",
+      "reason": "Labeled backdoor activity in dataset (180 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 180,
+      "true_attack_cat": "backdoor"
+    },
+    {
+      "source_ip": "10.10.10.200",
+      "total_connections": 156,
+      "unique_destinations": 13,
+      "unique_ports": 12,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 46.5,
+      "conn_rate_per_sec": 3.35,
+      "peak_window_ips": 13,
+      "peak_window_ports": 12,
+      "peak_ports_per_ip": 12,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 156,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "Strobe scan detected: 13 hosts and 12 ports scanned in a 60s window; High ratio of failed/interrupted connections: 100.0% (total: 156)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 156,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "10.50.0.8",
+      "total_connections": 155,
+      "unique_destinations": 31,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 23.1,
+      "conn_rate_per_sec": 6.71,
+      "peak_window_ips": 31,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 155,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Horizontal Port Scan)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Scanned 31 unique destination IPs in a 60s window",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 155,
+      "true_attack_cat": "dos"
+    },
+    {
+      "source_ip": "192.168.1.10",
+      "total_connections": 150,
+      "unique_destinations": 1,
+      "unique_ports": 25,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 52.15,
+      "conn_rate_per_sec": 2.88,
+      "peak_window_ips": 1,
+      "peak_window_ports": 25,
+      "peak_ports_per_ip": 25,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "REQ": 150,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "Scanned 25 unique ports on a single host in a 60s window; High ratio of failed/interrupted connections: 100.0% (total: 150)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 150,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "10.20.30.100",
+      "total_connections": 150,
+      "unique_destinations": 1,
+      "unique_ports": 30,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 14.9,
+      "conn_rate_per_sec": 10.07,
+      "peak_window_ips": 1,
+      "peak_window_ports": 30,
+      "peak_ports_per_ip": 30,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 150,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "Scanned 30 unique ports on a single host in a 60s window; High ratio of failed/interrupted connections: 100.0% (total: 150)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 150,
+      "true_attack_cat": "backdoor"
+    },
+    {
+      "source_ip": "10.77.5.22",
+      "total_connections": 102,
+      "unique_destinations": 34,
+      "unique_ports": 3,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 50.5,
+      "conn_rate_per_sec": 2.02,
+      "peak_window_ips": 34,
+      "peak_window_ports": 3,
+      "peak_ports_per_ip": 3,
+      "protocols": [
+        "udp"
+      ],
+      "services": [],
+      "states": {
+        "INT": 102,
+        "REQ": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Horizontal Port Scan)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Scanned 34 unique destination IPs in a 60s window",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 102,
+      "true_attack_cat": "dos"
+    },
+    {
+      "source_ip": "172.16.0.50",
+      "total_connections": 70,
+      "unique_destinations": 35,
+      "unique_ports": 1,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 55.2,
+      "conn_rate_per_sec": 1.27,
+      "peak_window_ips": 35,
+      "peak_window_ports": 1,
+      "peak_ports_per_ip": 1,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "INT": 70,
+        "REQ": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Horizontal Port Scan)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Scanned 35 unique destination IPs in a 60s window",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 70,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "192.168.5.77",
+      "total_connections": 66,
+      "unique_destinations": 1,
+      "unique_ports": 22,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 162.55,
+      "conn_rate_per_sec": 0.41,
+      "peak_window_ips": 1,
+      "peak_window_ports": 9,
+      "peak_ports_per_ip": 9,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "INT": 66,
+        "REQ": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "High ratio of failed/interrupted connections: 100.0% (total: 66)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 66,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "10.55.1.1",
+      "total_connections": 55,
+      "unique_destinations": 11,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 21.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 11,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 55,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (55 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 55,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.55.1.2",
+      "total_connections": 55,
+      "unique_destinations": 11,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 21.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 11,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 55,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (55 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 55,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.0.99.1",
+      "total_connections": 50,
+      "unique_destinations": 10,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 19.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 10,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 50,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (50 flows)",
+      "advanced_classification": "Distributed Scan Campaign",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "labeled_attacks_count": 50,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.0.99.2",
+      "total_connections": 50,
+      "unique_destinations": 10,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 19.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 10,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 50,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (50 flows)",
+      "advanced_classification": "Distributed Scan Campaign",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "labeled_attacks_count": 50,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.0.99.3",
+      "total_connections": 50,
+      "unique_destinations": 10,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 19.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 10,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 50,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (50 flows)",
+      "advanced_classification": "Distributed Scan Campaign",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "labeled_attacks_count": 50,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "192.168.10.5",
+      "total_connections": 60,
+      "unique_destinations": 4,
+      "unique_ports": 2,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 469.86,
+      "conn_rate_per_sec": 0.13,
+      "peak_window_ips": 4,
+      "peak_window_ports": 2,
+      "peak_ports_per_ip": 2,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "FIN": 28,
+        "CON": 32,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Normal",
+      "is_suspicious": false,
+      "severity": "Info",
+      "reason": "Normal traffic behavior",
+      "advanced_classification": "Normal Traffic",
+      "advanced_reason": "No advanced threat signatures detected",
+      "labeled_attacks_count": 0,
+      "true_attack_cat": "None"
+    },
+    {
+      "source_ip": "10.1.1.20",
+      "total_connections": 60,
+      "unique_destinations": 4,
+      "unique_ports": 2,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 418.97,
+      "conn_rate_per_sec": 0.14,
+      "peak_window_ips": 4,
+      "peak_window_ports": 2,
+      "peak_ports_per_ip": 2,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "CON": 31,
+        "FIN": 29,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Normal",
+      "is_suspicious": false,
+      "severity": "Info",
+      "reason": "Normal traffic behavior",
+      "advanced_classification": "Normal Traffic",
+      "advanced_reason": "No advanced threat signatures detected",
+      "labeled_attacks_count": 0,
+      "true_attack_cat": "None"
+    },
+    {
+      "source_ip": "10.2.2.30",
+      "total_connections": 60,
+      "unique_destinations": 4,
+      "unique_ports": 2,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 446.08,
+      "conn_rate_per_sec": 0.13,
+      "peak_window_ips": 4,
+      "peak_window_ports": 2,
+      "peak_ports_per_ip": 2,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "FIN": 32,
+        "CON": 28,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Normal",
+      "is_suspicious": false,
+      "severity": "Info",
+      "reason": "Normal traffic behavior",
+      "advanced_classification": "Normal Traffic",
+      "advanced_reason": "No advanced threat signatures detected",
+      "labeled_attacks_count": 0,
+      "true_attack_cat": "None"
+    }
+  ],
+  "suspicious_hosts": [
+    {
+      "source_ip": "172.31.200.5",
+      "total_connections": 200,
+      "unique_destinations": 1,
+      "unique_ports": 1,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 50.25,
+      "conn_rate_per_sec": 3.98,
+      "peak_window_ips": 1,
+      "peak_window_ports": 1,
+      "peak_ports_per_ip": 1,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "CON": 200,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Backdoor)",
+      "is_suspicious": true,
+      "severity": "Critical",
+      "reason": "Labeled backdoor activity in dataset (200 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 200,
+      "true_attack_cat": "backdoor"
+    },
+    {
+      "source_ip": "10.88.0.15",
+      "total_connections": 180,
+      "unique_destinations": 1,
+      "unique_ports": 1,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 54.0,
+      "conn_rate_per_sec": 3.33,
+      "peak_window_ips": 1,
+      "peak_window_ports": 1,
+      "peak_ports_per_ip": 1,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "CON": 180,
+        "REQ": 0,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Backdoor)",
+      "is_suspicious": true,
+      "severity": "Critical",
+      "reason": "Labeled backdoor activity in dataset (180 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 180,
+      "true_attack_cat": "backdoor"
+    },
+    {
+      "source_ip": "10.10.10.200",
+      "total_connections": 156,
+      "unique_destinations": 13,
+      "unique_ports": 12,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 46.5,
+      "conn_rate_per_sec": 3.35,
+      "peak_window_ips": 13,
+      "peak_window_ports": 12,
+      "peak_ports_per_ip": 12,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 156,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "Strobe scan detected: 13 hosts and 12 ports scanned in a 60s window; High ratio of failed/interrupted connections: 100.0% (total: 156)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 156,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "10.50.0.8",
+      "total_connections": 155,
+      "unique_destinations": 31,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 23.1,
+      "conn_rate_per_sec": 6.71,
+      "peak_window_ips": 31,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 155,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Horizontal Port Scan)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Scanned 31 unique destination IPs in a 60s window",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 155,
+      "true_attack_cat": "dos"
+    },
+    {
+      "source_ip": "192.168.1.10",
+      "total_connections": 150,
+      "unique_destinations": 1,
+      "unique_ports": 25,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 52.15,
+      "conn_rate_per_sec": 2.88,
+      "peak_window_ips": 1,
+      "peak_window_ports": 25,
+      "peak_ports_per_ip": 25,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "REQ": 150,
+        "INT": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "Scanned 25 unique ports on a single host in a 60s window; High ratio of failed/interrupted connections: 100.0% (total: 150)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 150,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "10.20.30.100",
+      "total_connections": 150,
+      "unique_destinations": 1,
+      "unique_ports": 30,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 14.9,
+      "conn_rate_per_sec": 10.07,
+      "peak_window_ips": 1,
+      "peak_window_ports": 30,
+      "peak_ports_per_ip": 30,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 150,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "Scanned 30 unique ports on a single host in a 60s window; High ratio of failed/interrupted connections: 100.0% (total: 150)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 150,
+      "true_attack_cat": "backdoor"
+    },
+    {
+      "source_ip": "10.77.5.22",
+      "total_connections": 102,
+      "unique_destinations": 34,
+      "unique_ports": 3,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 50.5,
+      "conn_rate_per_sec": 2.02,
+      "peak_window_ips": 34,
+      "peak_window_ports": 3,
+      "peak_ports_per_ip": 3,
+      "protocols": [
+        "udp"
+      ],
+      "services": [],
+      "states": {
+        "INT": 102,
+        "REQ": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Horizontal Port Scan)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Scanned 34 unique destination IPs in a 60s window",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 102,
+      "true_attack_cat": "dos"
+    },
+    {
+      "source_ip": "172.16.0.50",
+      "total_connections": 70,
+      "unique_destinations": 35,
+      "unique_ports": 1,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 55.2,
+      "conn_rate_per_sec": 1.27,
+      "peak_window_ips": 35,
+      "peak_window_ports": 1,
+      "peak_ports_per_ip": 1,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "INT": 70,
+        "REQ": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Horizontal Port Scan)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Scanned 35 unique destination IPs in a 60s window",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 70,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "192.168.5.77",
+      "total_connections": 66,
+      "unique_destinations": 1,
+      "unique_ports": 22,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 162.55,
+      "conn_rate_per_sec": 0.41,
+      "peak_window_ips": 1,
+      "peak_window_ports": 9,
+      "peak_ports_per_ip": 9,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "INT": 66,
+        "REQ": 0,
+        "RST": 0
+      },
+      "classification": "Suspicious (Stealth Scan (High Failed Conn Ratio))",
+      "is_suspicious": true,
+      "severity": "Medium",
+      "reason": "High ratio of failed/interrupted connections: 100.0% (total: 66)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 66,
+      "true_attack_cat": "reconnaissance"
+    },
+    {
+      "source_ip": "10.55.1.1",
+      "total_connections": 55,
+      "unique_destinations": 11,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 21.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 11,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 55,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (55 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 55,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.55.1.2",
+      "total_connections": 55,
+      "unique_destinations": 11,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 21.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 11,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 55,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (55 flows)",
+      "advanced_classification": "Standard Port Scan (Single Host)",
+      "advanced_reason": "Participated in high-rate or threshold-based port scans",
+      "labeled_attacks_count": 55,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.0.99.1",
+      "total_connections": 50,
+      "unique_destinations": 10,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 19.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 10,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 50,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (50 flows)",
+      "advanced_classification": "Distributed Scan Campaign",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "labeled_attacks_count": 50,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.0.99.2",
+      "total_connections": 50,
+      "unique_destinations": 10,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 19.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 10,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 50,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (50 flows)",
+      "advanced_classification": "Distributed Scan Campaign",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "labeled_attacks_count": 50,
+      "true_attack_cat": "exploits"
+    },
+    {
+      "source_ip": "10.0.99.3",
+      "total_connections": 50,
+      "unique_destinations": 10,
+      "unique_ports": 5,
+      "total_bytes": 0,
+      "total_packets": 0,
+      "duration_sec": 19.6,
+      "conn_rate_per_sec": 2.55,
+      "peak_window_ips": 10,
+      "peak_window_ports": 5,
+      "peak_ports_per_ip": 5,
+      "protocols": [
+        "tcp"
+      ],
+      "services": [],
+      "states": {
+        "RST": 50,
+        "REQ": 0,
+        "INT": 0
+      },
+      "classification": "Suspicious (Attack: Exploits)",
+      "is_suspicious": true,
+      "severity": "High",
+      "reason": "Labeled attack traffic in dataset (50 flows)",
+      "advanced_classification": "Distributed Scan Campaign",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "labeled_attacks_count": 50,
+      "true_attack_cat": "exploits"
+    }
+  ]
+}
