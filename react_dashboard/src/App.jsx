@@ -4,10 +4,12 @@ import {
   ShieldX, Terminal, Cpu, Database, Network, ArrowRight,
   RefreshCw, Info, Download, FileText, Sun, Moon, Activity,
   Zap, Eye, Lock, TrendingUp, Server, BarChart2, Sparkles,
-  Copy, Check, ChevronUp, ChevronDown, ChevronsUpDown, Clock, Wifi
+  Copy, Check, ChevronUp, ChevronDown, ChevronsUpDown, Wifi,
+  Menu, X, LayoutDashboard, FlaskConical
 } from 'lucide-react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import NewAnalysis from './pages/NewAnalysis';
 import './App.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -37,19 +39,53 @@ function useCopyToClipboard(timeout = 2000) {
 }
 
 /* ============================================================
-   LIVE CLOCK COMPONENT
+   SIDEBAR NAVIGATION
    ============================================================ */
-function LiveClock() {
-  const [time, setTime] = useState(new Date());
-  useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
+const NAV_ITEMS = [
+  { id: 'dashboard', label: 'SOC Dashboard',  icon: LayoutDashboard },
+  { id: 'analysis',  label: 'New Analysis',    icon: FlaskConical },
+];
+
+function Sidebar({ open, onClose, currentPage, onNavigate }) {
   return (
-    <span className="live-clock">
-      <Clock size={11} />
-      {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-    </span>
+    <>
+      {/* Backdrop */}
+      {open && (
+        <div
+          className="sidebar-backdrop"
+          onClick={onClose}
+        />
+      )}
+      {/* Drawer */}
+      <aside className={`sidebar-drawer ${open ? 'sidebar-drawer-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="topbar-logo">
+            <div className="topbar-logo-icon"><Shield size={14} /></div>
+            <span className="topbar-title">Network Bouncer</span>
+          </div>
+          <button className="topbar-btn topbar-btn-icon" onClick={onClose}>
+            <X size={15} />
+          </button>
+        </div>
+        <nav className="sidebar-nav">
+          {NAV_ITEMS.map(item => (
+            <button
+              key={item.id}
+              className={`sidebar-nav-item ${currentPage === item.id ? 'sidebar-nav-item-active' : ''}`}
+              onClick={() => { onNavigate(item.id); onClose(); }}
+            >
+              <item.icon size={16} />
+              <span>{item.label}</span>
+              {currentPage === item.id && <span className="sidebar-nav-active-dot" />}
+            </button>
+          ))}
+        </nav>
+        <div className="sidebar-footer">
+          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Network Bouncer NIDS v2.0</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>Rule-Based Sliding-Window Engine</div>
+        </div>
+      </aside>
+    </>
   );
 }
 
@@ -147,6 +183,8 @@ export default function App() {
   const [sortCol, setSortCol] = useState('total_connections');
   const [sortDir, setSortDir] = useState('desc');
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Apply dark mode class
   useEffect(() => {
@@ -325,12 +363,27 @@ export default function App() {
   /* ---- RENDER ---- */
   return (
     <>
+      {/* ---- SIDEBAR ---- */}
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
+      />
+
       <div className="app-layout">
         <div className="main-content">
 
           {/* ---- TOPBAR ---- */}
           <header className="topbar">
             <div className="topbar-left">
+              <button
+                className="topbar-btn topbar-btn-icon hamburger-btn"
+                onClick={() => setSidebarOpen(true)}
+                title="Open menu"
+              >
+                <Menu size={16} />
+              </button>
               <div className="topbar-logo">
                 <div className="topbar-logo-icon">
                   <Shield size={15} />
@@ -338,30 +391,45 @@ export default function App() {
                 <span className="topbar-title">Network Bouncer</span>
               </div>
               <div className="topbar-divider" />
-              <span className="topbar-breadcrumb">SOC Dashboard</span>
-              <div className="topbar-divider" />
-              <LiveClock />
+              <span className="topbar-breadcrumb">
+                {currentPage === 'dashboard' ? 'SOC Dashboard' : 'New Analysis'}
+              </span>
             </div>
             <div className="topbar-right">
-              {lastUpdated && (
+              {currentPage === 'dashboard' && lastUpdated && (
                 <span className="topbar-last-updated">
                   Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
               )}
-              <button onClick={fetchData} className="topbar-btn topbar-btn-icon" title="Refresh data">
-                <RefreshCw size={14} />
-              </button>
-              <button onClick={downloadCSV} className="topbar-btn">
-                <Download size={13} /> Export CSV
-              </button>
-              <button onClick={downloadPDF} className="topbar-btn">
-                <FileText size={13} /> Print PDF
-              </button>
+              {currentPage === 'dashboard' && (
+                <button onClick={fetchData} className="topbar-btn topbar-btn-icon" title="Refresh data">
+                  <RefreshCw size={14} />
+                </button>
+              )}
+              {currentPage === 'dashboard' && (
+                <button onClick={downloadCSV} className="topbar-btn">
+                  <Download size={13} /> Export CSV
+                </button>
+              )}
+              {currentPage === 'dashboard' && (
+                <button onClick={downloadPDF} className="topbar-btn">
+                  <FileText size={13} /> Print PDF
+                </button>
+              )}
               <button onClick={() => setDarkMode(!darkMode)} className="topbar-btn topbar-btn-icon" title="Toggle theme">
                 {darkMode ? <Sun size={14} /> : <Moon size={14} />}
               </button>
             </div>
           </header>
+
+          {/* ---- NEW ANALYSIS PAGE ---- */}
+          {currentPage === 'analysis' && (
+            <NewAnalysis darkMode={darkMode} />
+          )}
+
+          {/* ---- SOC DASHBOARD (only when on dashboard page) ---- */}
+          {currentPage === 'dashboard' && (
+          <>
 
           {/* ---- PAGE HEADER ---- */}
           <div className="page-header">
@@ -827,126 +895,102 @@ export default function App() {
                     <div className="info-card-title">Advanced Correlation Engine</div>
                   </div>
                   <div className="info-card-text">
-                    Detects stealth attack vectors that bypass simple threshold rules:
+                    Detects stealth attack vectors that bypass simple threshold rules.
                     <br /><br />
-                    <strong>Distributed Campaigns</strong> — Cross-IP coordinated probes. <strong>Slow Scans</strong> — Low-rate long-duration port sweeps (&lt; 0.05 conns/s).
-                    <strong> Benign Profiling</strong> — Filters high-payload services to reduce false alarms.
+                    <strong>Distributed Campaigns</strong> — Cross-IP coordinated probes. <strong>Slow Scans</strong> — Low-rate long-duration port sweeps. <strong>Benign Profiling</strong> — Filters high-payload services to reduce false alarms.
                   </div>
                 </div>
               </div>
             </section>
 
+          </div> {/* end page-content */}
+
+          {/* ============================================================
+            PRINT-ONLY REPORT
+            ============================================================ */}
+          <div className="print-only-report">
+            <div className="print-header">
+              <div>
+                <h1>THE NETWORK BOUNCER</h1>
+                <p>NIDS Sliding-Window Threat Analysis Report</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ fontWeight: 'bold', margin: 0 }}>Date: {new Date().toLocaleDateString()}</p>
+                <p style={{ margin: 0 }}>Dataset: {report.dataset_name ? report.dataset_name.split(/[/\\]/).pop() : 'N/A'}</p>
+              </div>
+            </div>
+
+            <div className="print-meta-grid">
+              <div className="print-meta-card">
+                <h3>Total Hosts</h3>
+                <p>{report.summary.total_ips}</p>
+              </div>
+              <div className="print-meta-card" style={{ borderLeft: '3px solid #EF4444' }}>
+                <h3>Suspicious Hosts</h3>
+                <p>{report.summary.suspicious_ips}</p>
+              </div>
+              <div className="print-meta-card" style={{ borderLeft: '3px solid #F59E0B' }}>
+                <h3>High / Critical</h3>
+                <p>{(report.summary.severity_distribution.Critical || 0) + (report.summary.severity_distribution.High || 0)}</p>
+              </div>
+              <div className="print-meta-card" style={{ borderLeft: '3px solid #10B981' }}>
+                <h3>Normal Hosts</h3>
+                <p>{report.summary.normal_ips}</p>
+              </div>
+            </div>
+
+            <h2 className="print-section-title">Severity Distribution</h2>
+            <table className="print-table">
+              <thead><tr>
+                <th style={{ width: '30%' }}>Severity Level</th>
+                <th>Count</th>
+              </tr></thead>
+              <tbody>
+                <tr><td><span className="print-badge print-badge-critical">Critical</span></td><td>{report.summary.severity_distribution.Critical || 0} hosts</td></tr>
+                <tr><td><span className="print-badge print-badge-high">High</span></td><td>{report.summary.severity_distribution.High || 0} hosts</td></tr>
+                <tr><td><span className="print-badge print-badge-medium">Medium</span></td><td>{report.summary.severity_distribution.Medium || 0} hosts</td></tr>
+                <tr><td><span className="print-badge print-badge-normal">Normal</span></td><td>{report.summary.severity_distribution.Normal || 0} hosts</td></tr>
+              </tbody>
+            </table>
+
+            <div className="page-break" />
+
+            <h2 className="print-section-title">Suspicious Traffic &amp; Threat Signatures</h2>
+            <table className="print-table">
+              <thead><tr>
+                <th style={{ width: '18%' }}>Source IP</th>
+                <th style={{ width: '10%', textAlign: 'center' }}>Conns</th>
+                <th style={{ width: '10%', textAlign: 'center' }}>Ports</th>
+                <th style={{ width: '14%' }}>Severity</th>
+                <th style={{ width: '48%' }}>Detection Reasoning</th>
+              </tr></thead>
+              <tbody>
+                {report.hosts?.filter(h => h.is_suspicious).length > 0 ? (
+                  report.hosts.filter(h => h.is_suspicious).map(host => (
+                    <tr key={host.source_ip} className="no-break">
+                      <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{host.source_ip}</td>
+                      <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.total_connections.toLocaleString()}</td>
+                      <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.unique_ports}</td>
+                      <td><span className={`print-badge print-badge-${host.severity.toLowerCase()}`}>{host.severity}</span></td>
+                      <td>{host.reason || 'Normal traffic behavior'}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan="5" style={{ textAlign: 'center' }}>No suspicious hosts detected.</td></tr>
+                )}
+              </tbody>
+            </table>
+
+            <footer style={{ marginTop: '3rem', borderTop: '1px solid #E5E7EB', paddingTop: '1rem', fontSize: '8pt', color: '#9ca3af', textAlign: 'center' }}>
+              This report was generated by The Network Bouncer NIDS. Copyright &copy; {new Date().getFullYear()}. All rights reserved.
+            </footer>
           </div>
-        </div>
-      </div>
 
-      {/* ============================================================
-        PRINT-ONLY REPORT
-        ============================================================ */}
-      <div className="print-only-report">
-        <div className="print-header">
-          <div>
-            <h1>THE NETWORK BOUNCER</h1>
-            <p>NIDS Sliding-Window Threat Analysis Report</p>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontWeight: 'bold', margin: 0 }}>Date: {new Date().toLocaleDateString()}</p>
-            <p style={{ margin: 0 }}>Dataset: {report.dataset_name ? report.dataset_name.split(/[/\\]/).pop() : 'N/A'}</p>
-          </div>
-        </div>
+          </>
+          )} {/* end currentPage === 'dashboard' */}
 
-        <div className="print-meta-grid">
-          <div className="print-meta-card">
-            <h3>Total Hosts</h3>
-            <p>{report.summary.total_ips}</p>
-          </div>
-          <div className="print-meta-card" style={{ borderLeft: '3px solid #EF4444' }}>
-            <h3>Suspicious Hosts</h3>
-            <p>{report.summary.suspicious_ips}</p>
-          </div>
-          <div className="print-meta-card" style={{ borderLeft: '3px solid #F59E0B' }}>
-            <h3>High / Critical</h3>
-            <p>{(report.summary.severity_distribution.Critical || 0) + (report.summary.severity_distribution.High || 0)}</p>
-          </div>
-          <div className="print-meta-card" style={{ borderLeft: '3px solid #10B981' }}>
-            <h3>Normal Hosts</h3>
-            <p>{report.summary.normal_ips}</p>
-          </div>
-        </div>
-
-        <h2 className="print-section-title">Severity Distribution</h2>
-        <table className="print-table">
-          <thead><tr>
-            <th style={{ width: '30%' }}>Severity Level</th>
-            <th>Count</th>
-          </tr></thead>
-          <tbody>
-            <tr><td><span className="print-badge print-badge-critical">Critical</span></td><td>{report.summary.severity_distribution.Critical || 0} hosts (Immediate isolation recommended)</td></tr>
-            <tr><td><span className="print-badge print-badge-high">High</span></td><td>{report.summary.severity_distribution.High || 0} hosts (Active reconnaissance / scanning)</td></tr>
-            <tr><td><span className="print-badge print-badge-medium">Medium</span></td><td>{report.summary.severity_distribution.Medium || 0} hosts (Rate anomalies / state deviations)</td></tr>
-            <tr><td><span className="print-badge print-badge-normal">Normal</span></td><td>{report.summary.severity_distribution.Normal || 0} hosts (Baseline behavior)</td></tr>
-          </tbody>
-        </table>
-
-        <div className="page-break" />
-
-        <h2 className="print-section-title">Suspicious Traffic & Threat Signatures</h2>
-        <table className="print-table">
-          <thead><tr>
-            <th style={{ width: '18%' }}>Source IP</th>
-            <th style={{ width: '10%', textAlign: 'center' }}>Conns</th>
-            <th style={{ width: '10%', textAlign: 'center' }}>Ports</th>
-            <th style={{ width: '14%' }}>Severity</th>
-            <th style={{ width: '48%' }}>Detection Reasoning</th>
-          </tr></thead>
-          <tbody>
-            {report.hosts?.filter(h => h.is_suspicious).length > 0 ? (
-              report.hosts.filter(h => h.is_suspicious).map(host => (
-                <tr key={host.source_ip} className="no-break">
-                  <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{host.source_ip}</td>
-                  <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.total_connections.toLocaleString()}</td>
-                  <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.unique_ports}</td>
-                  <td><span className={`print-badge print-badge-${host.severity.toLowerCase()}`}>{host.severity}</span></td>
-                  <td>{host.reason || 'Normal traffic behavior'}</td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan="5" style={{ textAlign: 'center' }}>No suspicious hosts detected.</td></tr>
-            )}
-          </tbody>
-        </table>
-
-        <div className="page-break" />
-
-        <h2 className="print-section-title" style={{ color: '#8B5CF6' }}>Advanced Correlation Analytics Directory</h2>
-        <p style={{ fontSize: '10pt', color: '#6b7280', marginBottom: '1.5rem' }}>
-          Correlated traffic anomalies evaluated via long-term heuristics, cross-host probes, and volume pattern profiles.
-        </p>
-        <table className="print-table" style={{ borderTop: '2px solid #8B5CF6' }}>
-          <thead><tr>
-            <th style={{ width: '22%' }}>Source IP</th>
-            <th style={{ width: '25%' }}>Advanced Classification</th>
-            <th style={{ width: '53%' }}>Correlation Reasoning</th>
-          </tr></thead>
-          <tbody>
-            {report.hosts?.filter(h => h.is_suspicious).length > 0 ? (
-              report.hosts.filter(h => h.is_suspicious).map(host => (
-                <tr key={host.source_ip} className="no-break">
-                  <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{host.source_ip}</td>
-                  <td style={{ color: '#8B5CF6', fontWeight: '500' }}>{host.advanced_classification || 'Normal Traffic'}</td>
-                  <td>{host.advanced_reason || 'No advanced threat signatures detected.'}</td>
-                </tr>
-              ))
-            ) : (
-              <tr><td colSpan="3" style={{ textAlign: 'center' }}>No advanced threat signatures detected.</td></tr>
-            )}
-          </tbody>
-        </table>
-
-        <footer style={{ marginTop: '3rem', borderTop: '1px solid #E5E7EB', paddingTop: '1rem', fontSize: '8pt', color: '#9ca3af', textAlign: 'center' }}>
-          This report was generated by The Network Bouncer NIDS. Copyright &copy; {new Date().getFullYear()}. All rights reserved.
-        </footer>
-      </div>
+        </div> {/* end main-content */}
+      </div> {/* end app-layout */}
     </>
   );
 }
