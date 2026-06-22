@@ -498,6 +498,8 @@ body {
    ============================================================ */
 .data-table-wrap {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 500px;
   border-radius: var(--radius);
   border: 1px solid var(--border-color);
   background: var(--bg-card);
@@ -524,6 +526,9 @@ body {
   white-space: nowrap;
   font-family: var(--font-mono);
   background: var(--bg-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .data-table tbody tr {

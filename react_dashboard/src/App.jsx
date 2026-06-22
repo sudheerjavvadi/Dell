@@ -42,8 +42,10 @@ function useCopyToClipboard(timeout = 2000) {
    SIDEBAR NAVIGATION
    ============================================================ */
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'SOC Dashboard',  icon: LayoutDashboard },
-  { id: 'analysis',  label: 'New Analysis',    icon: FlaskConical },
+  { id: 'dashboard', label: 'SOC Dashboard', icon: LayoutDashboard },
+
+  { id: 'analysis', label: 'New Analysis', icon: FlaskConical },
+  { id: 'ml_dashboard', label: 'ML Model', icon: Cpu },
 ];
 
 function Sidebar({ open, onClose, currentPage, onNavigate }) {
@@ -200,8 +202,9 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('/report_data.json');
-      if (!response.ok) throw new Error('Could not load report_data.json. Run the analyzer script first.');
+      const endpoint = currentPage === 'ml_dashboard' ? '/ml_report_data.json' : '/report_data.json';
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error(`Could not load ${endpoint}. Run the analyzer script first.`);
       const data = await response.json();
       setReport(data);
       setLastUpdated(new Date());
@@ -213,7 +216,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentPage]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -392,26 +395,26 @@ export default function App() {
               </div>
               <div className="topbar-divider" />
               <span className="topbar-breadcrumb">
-                {currentPage === 'dashboard' ? 'SOC Dashboard' : 'New Analysis'}
+                {currentPage === 'dashboard' ? 'SOC Dashboard' : currentPage === 'ml_dashboard' ? 'ML Model Dashboard' : 'New Analysis'}
               </span>
             </div>
             <div className="topbar-right">
-              {currentPage === 'dashboard' && lastUpdated && (
+              {['dashboard', 'ml_dashboard'].includes(currentPage) && lastUpdated && (
                 <span className="topbar-last-updated">
                   Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
               )}
-              {currentPage === 'dashboard' && (
+              {['dashboard', 'ml_dashboard'].includes(currentPage) && (
                 <button onClick={fetchData} className="topbar-btn topbar-btn-icon" title="Refresh data">
                   <RefreshCw size={14} />
                 </button>
               )}
-              {currentPage === 'dashboard' && (
+              {['dashboard', 'ml_dashboard'].includes(currentPage) && (
                 <button onClick={downloadCSV} className="topbar-btn">
                   <Download size={13} /> Export CSV
                 </button>
               )}
-              {currentPage === 'dashboard' && (
+              {['dashboard', 'ml_dashboard'].includes(currentPage) && (
                 <button onClick={downloadPDF} className="topbar-btn">
                   <FileText size={13} /> Print PDF
                 </button>
@@ -427,566 +430,568 @@ export default function App() {
             <NewAnalysis darkMode={darkMode} />
           )}
 
-          {/* ---- SOC DASHBOARD (only when on dashboard page) ---- */}
-          {currentPage === 'dashboard' && (
-          <>
+          {/* ---- SOC / ML DASHBOARD ---- */}
+          {['dashboard', 'ml_dashboard'].includes(currentPage) && (
+            <>
 
-          {/* ---- PAGE HEADER ---- */}
-          <div className="page-header">
-            <div className="page-header-meta">
-              <div className="live-dot" />
-              <span className="page-header-label">Live Monitoring Active</span>
-            </div>
-            <h1 className="page-header-title">Security Operations Dashboard</h1>
-            <p className="page-header-desc">Network Traffic Analyzer & Port Scanning Detection System — Powered by rule-based sliding-window heuristics</p>
-            <div className="page-header-bottom">
-              <div className="dataset-pill">
-                <Database size={12} /> {report.dataset_name || 'Unknown Dataset'}
-              </div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                <div className="dataset-pill">
-                  <Activity size={12} /> {report.summary.total_ips} Total Hosts
+              {/* ---- PAGE HEADER ---- */}
+              <div className="page-header">
+                <div className="page-header-meta">
+                  <div className="live-dot" />
+                  <span className="page-header-label">Live Monitoring Active</span>
                 </div>
-                <div className="dataset-pill" style={{ color: 'var(--color-critical)' }}>
-                  <ShieldAlert size={12} /> {report.summary.suspicious_ips} Suspicious IPs
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="page-content">
-
-            {/* ---- THREAT STATS TICKER ---- */}
-            {report.suspicious_hosts.length > 0 && (
-              <div className="stats-ticker">
-                <div className="stats-ticker-item">
-                  <Wifi size={12} />
-                  <span>{suspStats.conns.toLocaleString()} suspicious flows</span>
-                </div>
-                <div className="stats-ticker-sep">·</div>
-                <div className="stats-ticker-item">
-                  <Activity size={12} />
-                  <span>{fmtBytes(suspStats.bytes)} data volume</span>
-                </div>
-                <div className="stats-ticker-sep">·</div>
-                <div className="stats-ticker-item">
-                  <BarChart2 size={12} />
-                  <span>{suspStats.pkts.toLocaleString()} packets captured</span>
-                </div>
-              </div>
-            )}
-
-            {/* ---- ALERT CALLOUT ---- */}
-            {(severityDist.Critical > 0 || severityDist.High > 0) ? (
-              <div className="callout callout-critical">
-                <div className="callout-icon">🚨</div>
-                <div className="callout-content">
-                  <div className="callout-title">
-                    Active Threats Detected — Immediate Review Required
+                <h1 className="page-header-title">{currentPage === 'ml_dashboard' ? 'Deep Learning Anomaly Detection' : 'Security Operations Dashboard'}</h1>
+                <p className="page-header-desc">{currentPage === 'ml_dashboard' ? 'Network Traffic Analyzer — Powered by Deep Neural Networks (MLPClassifier)' : 'Network Traffic Analyzer & Port Scanning Detection System — Powered by rule-based sliding-window heuristics'}</p>
+                <div className="page-header-bottom">
+                  <div className="dataset-pill">
+                    <Database size={12} /> {report.dataset_name || 'Unknown Dataset'}
                   </div>
-                  <div className="callout-text">
-                    {severityDist.Critical > 0 && `${severityDist.Critical} Critical severity host(s) detected. `}
-                    {severityDist.High > 0 && `${severityDist.High} High risk scanner(s) actively probing. `}
-                    {severityDist.Medium > 0 && `${severityDist.Medium} Medium risk stealth campaign IP(s) flagged. `}
-                    Select any host in the directory table below to investigate and review AI-generated mitigation steps.
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    <div className="dataset-pill">
+                      <Activity size={12} /> {report.summary.total_ips} Total Hosts
+                    </div>
+                    <div className="dataset-pill" style={{ color: 'var(--color-critical)' }}>
+                      <ShieldAlert size={12} /> {report.summary.suspicious_ips} Suspicious IPs
+                    </div>
                   </div>
-                </div>
-              </div>
-            ) : (
-              <div className="callout callout-success">
-                <div className="callout-icon">✅</div>
-                <div className="callout-content">
-                  <div className="callout-title">Network Status: Normal</div>
-                  <div className="callout-text">No critical threats detected in the current dataset. Monitoring is active.</div>
-                </div>
-              </div>
-            )}
-
-            {/* ---- SECURITY OVERVIEW CARDS ---- */}
-            <section className="section-gap">
-              <div className="section-header">
-                <div>
-                  <div className="section-title">
-                    <div className="section-title-dot" style={{ background: 'var(--color-blue)' }} />
-                    Security Overview
-                  </div>
-                </div>
-              </div>
-              <div className="metrics-grid">
-                <div className="card card-critical">
-                  <div className="card-header">
-                    <span className="card-label">Critical Threats</span>
-                    <div className="card-icon"><ShieldAlert size={16} /></div>
-                  </div>
-                  <div className="card-value">{severityDist.Critical || 0}</div>
-                  <div className="card-desc">Immediate isolation required</div>
-                </div>
-                <div className="card card-high">
-                  <div className="card-header">
-                    <span className="card-label">High Risk</span>
-                    <div className="card-icon"><AlertTriangle size={16} /></div>
-                  </div>
-                  <div className="card-value">{severityDist.High || 0}</div>
-                  <div className="card-desc">Active scanners & probe events</div>
-                </div>
-                <div className="card card-medium">
-                  <div className="card-header">
-                    <span className="card-label">Medium Risk</span>
-                    <div className="card-icon"><Shield size={16} /></div>
-                  </div>
-                  <div className="card-value">{severityDist.Medium || 0}</div>
-                  <div className="card-desc">Stealth / rate anomalies</div>
-                </div>
-                <div className="card card-success">
-                  <div className="card-header">
-                    <span className="card-label">Normal Nodes</span>
-                    <div className="card-icon"><CheckCircle size={16} /></div>
-                  </div>
-                  <div className="card-value">{report.summary.normal_ips}</div>
-                  <div className="card-desc">Within baseline parameters</div>
-                </div>
-              </div>
-            </section>
-
-            {/* ---- CHARTS ---- */}
-            <section className="section-gap">
-              <div className="section-header">
-                <div>
-                  <div className="section-title">
-                    <div className="section-title-dot" style={{ background: 'var(--color-purple)' }} />
-                    Analytics
-                  </div>
-                </div>
-              </div>
-              <div className="charts-grid">
-                <div className="chart-card">
-                  <div className="chart-title">Threat Level Breakdown</div>
-                  <div className="chart-subtitle">Severity distribution across all hosts</div>
-                  <div className="chart-wrapper" style={{ height: 240 }}>
-                    <Doughnut data={doughnutData} options={doughnutOptions} />
-                  </div>
-                </div>
-                <div className="chart-card">
-                  <div className="chart-title">Top Suspicious Source IPs</div>
-                  <div className="chart-subtitle">Connection volume & unique ports targeted</div>
-                  <div className="chart-wrapper" style={{ height: 260 }}>
-                    <Bar data={barData} options={barOptions} />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* ---- HOST DIRECTORY + INSPECTOR ---- */}
-            <section className="section-gap">
-              <div className="section-header">
-                <div>
-                  <div className="section-title">
-                    <div className="section-title-dot" style={{ background: 'var(--color-critical)' }} />
-                    Port Scan Detection Center
-                  </div>
-                  <div className="section-subtitle">Click any host to run threat explainability & AI co-pilot analysis</div>
-                </div>
-                <div className="filter-bar">
-                  <div className="search-box">
-                    <Search size={13} className="search-box-icon" />
-                    <input
-                      type="text"
-                      placeholder="Search IP address..."
-                      value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
-                      className="search-input"
-                    />
-                  </div>
-                  <select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)} className="filter-select">
-                    <option value="ALL">All Severities</option>
-                    <option value="Critical">Critical</option>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Info">Normal</option>
-                  </select>
                 </div>
               </div>
 
-              <div className="content-grid">
-                {/* TABLE */}
-                <div>
-                  <div className="data-table-wrap">
-                    <table className="data-table">
-                      <thead>
-                        <tr>
-                          <th className="sortable-th" onClick={() => handleSort('source_ip')}>
-                            Source IP <SortIcon col="source_ip" />
-                          </th>
-                          <th className="sortable-th" style={{ textAlign: 'center' }} onClick={() => handleSort('total_connections')}>
-                            Conns <SortIcon col="total_connections" />
-                          </th>
-                          <th className="sortable-th" style={{ textAlign: 'center' }} onClick={() => handleSort('unique_destinations')}>
-                            Dst IPs <SortIcon col="unique_destinations" />
-                          </th>
-                          <th className="sortable-th" style={{ textAlign: 'center' }} onClick={() => handleSort('unique_ports')}>
-                            Ports <SortIcon col="unique_ports" />
-                          </th>
-                          <th style={{ textAlign: 'center' }}>Severity</th>
-                          <th>Classification</th>
-                          <th style={{ textAlign: 'right' }}>Inspect</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sortedFilteredHosts.length > 0 ? sortedFilteredHosts.map(host => (
-                          <tr
-                            key={host.source_ip}
-                            onClick={() => setSelectedIp(host.source_ip)}
-                            className={selectedIp === host.source_ip ? 'active' : ''}
-                          >
-                            <td className="ip-cell">
-                              {(host.severity === 'Critical' || host.severity === 'High') && (
-                                <span className="threat-pulse" />
-                              )}
-                              {host.source_ip}
-                            </td>
-                            <td className="num-cell">{host.total_connections.toLocaleString()}</td>
-                            <td className="num-cell">{host.unique_destinations}</td>
-                            <td className="num-cell">{host.unique_ports}</td>
-                            <td style={{ textAlign: 'center' }}>
-                              <span className={`badge badge-${host.severity.toLowerCase()}`}>
-                                {host.severity}
-                              </span>
-                            </td>
-                            <td className="mono" style={{
-                              fontSize: 11.5,
-                              color: host.classification?.includes('Distributed') ? 'var(--color-critical)' :
-                                host.classification?.includes('Stealth') ? 'var(--color-warning)' :
-                                  host.classification?.includes('Vertical') ? 'var(--color-blue)' :
-                                    host.classification?.includes('Strobe') ? 'var(--color-purple)' :
-                                      'var(--text-secondary)'
-                            }}>
-                              {host.classification}
-                            </td>
-                            <td style={{ textAlign: 'right' }}>
-                              <button className="table-action-btn">
-                                <ArrowRight size={13} />
-                              </button>
-                            </td>
-                          </tr>
-                        )) : (
-                          <tr><td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-tertiary)', fontSize: 13 }}>
-                            No hosts matching your filters.
-                          </td></tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
-                    <span>Showing {sortedFilteredHosts.length} of {report.hosts.length} hosts</span>
-                    <span>UNSW-NB15 Verified Ground-Truth Labels</span>
-                  </div>
-                </div>
+              <div className="page-content">
 
-                {/* INSPECTOR PANEL */}
-                <div className="inspector">
-                  {selectedHost ? (
-                    <>
-                      <div className="inspector-header">
-                        <div className="inspector-header-icon" style={{
-                          background: selectedHost.severity === 'Critical' ? 'var(--color-critical-bg)' :
-                            selectedHost.severity === 'High' ? 'var(--color-warning-bg)' :
-                              selectedHost.severity === 'Medium' ? 'var(--color-warning-bg)' : 'var(--color-success-bg)',
-                          color: selectedHost.severity === 'Critical' ? 'var(--color-critical)' :
-                            selectedHost.severity === 'High' ? 'var(--color-warning)' :
-                              selectedHost.severity === 'Medium' ? 'var(--color-warning)' : 'var(--color-success)'
-                        }}>
-                          <ShieldAlert size={16} />
-                        </div>
-                        <div>
-                          <div className="inspector-title">Threat Intelligence</div>
-                          <div className="inspector-sub">Host forensics & trigger analysis</div>
-                        </div>
+                {/* ---- THREAT STATS TICKER ---- */}
+                {report.suspicious_hosts.length > 0 && (
+                  <div className="stats-ticker">
+                    <div className="stats-ticker-item">
+                      <Wifi size={12} />
+                      <span>{suspStats.conns.toLocaleString()} suspicious flows</span>
+                    </div>
+                    <div className="stats-ticker-sep">·</div>
+                    <div className="stats-ticker-item">
+                      <Activity size={12} />
+                      <span>{fmtBytes(suspStats.bytes)} data volume</span>
+                    </div>
+                    <div className="stats-ticker-sep">·</div>
+                    <div className="stats-ticker-item">
+                      <BarChart2 size={12} />
+                      <span>{suspStats.pkts.toLocaleString()} packets captured</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* ---- ALERT CALLOUT ---- */}
+                {(severityDist.Critical > 0 || severityDist.High > 0) ? (
+                  <div className="callout callout-critical">
+                    <div className="callout-icon">🚨</div>
+                    <div className="callout-content">
+                      <div className="callout-title">
+                        Active Threats Detected — Immediate Review Required
                       </div>
+                      <div className="callout-text">
+                        {severityDist.Critical > 0 && `${severityDist.Critical} Critical severity host(s) detected. `}
+                        {severityDist.High > 0 && `${severityDist.High} High risk scanner(s) actively probing. `}
+                        {severityDist.Medium > 0 && `${severityDist.Medium} Medium risk stealth campaign IP(s) flagged. `}
+                        Select any host in the directory table below to investigate and review AI-generated mitigation steps.
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="callout callout-success">
+                    <div className="callout-icon">✅</div>
+                    <div className="callout-content">
+                      <div className="callout-title">Network Status: Normal</div>
+                      <div className="callout-text">No critical threats detected in the current dataset. Monitoring is active.</div>
+                    </div>
+                  </div>
+                )}
 
-                      <div className="inspector-body">
-                        {/* Host ID Block */}
-                        <div className="info-block" style={{ marginBottom: 16 }}>
-                          <div className="info-row">
-                            <span className="info-label">Target Host</span>
-                            <span className="info-value">{selectedHost.source_ip}</span>
-                          </div>
-                          <div className="info-row">
-                            <span className="info-label">Threat Level</span>
-                            <span><span className={`badge badge-${selectedHost.severity.toLowerCase()}`}>{selectedHost.severity}</span></span>
-                          </div>
-                          <div className="info-row">
-                            <span className="info-label">Duration</span>
-                            <span className="info-value">{selectedHost.duration_sec}s</span>
-                          </div>
-                          <div className="info-row">
-                            <span className="info-label">Avg Rate</span>
-                            <span className="info-value">{selectedHost.conn_rate_per_sec}/s</span>
-                          </div>
-                          <div className="info-row" style={{ borderBottom: 'none' }}>
-                            <span className="info-label">Volume</span>
-                            <span className="info-value">{(selectedHost.total_bytes / 1024).toFixed(1)} KB</span>
-                          </div>
-                        </div>
+                {/* ---- SECURITY OVERVIEW CARDS ---- */}
+                <section className="section-gap">
+                  <div className="section-header">
+                    <div>
+                      <div className="section-title">
+                        <div className="section-title-dot" style={{ background: 'var(--color-blue)' }} />
+                        Security Overview
+                      </div>
+                    </div>
+                  </div>
+                  <div className="metrics-grid">
+                    <div className="card card-critical">
+                      <div className="card-header">
+                        <span className="card-label">Critical Threats</span>
+                        <div className="card-icon"><ShieldAlert size={16} /></div>
+                      </div>
+                      <div className="card-value">{severityDist.Critical || 0}</div>
+                      <div className="card-desc">Immediate isolation required</div>
+                    </div>
+                    <div className="card card-high">
+                      <div className="card-header">
+                        <span className="card-label">High Risk</span>
+                        <div className="card-icon"><AlertTriangle size={16} /></div>
+                      </div>
+                      <div className="card-value">{severityDist.High || 0}</div>
+                      <div className="card-desc">Active scanners & probe events</div>
+                    </div>
+                    <div className="card card-medium">
+                      <div className="card-header">
+                        <span className="card-label">Medium Risk</span>
+                        <div className="card-icon"><Shield size={16} /></div>
+                      </div>
+                      <div className="card-value">{severityDist.Medium || 0}</div>
+                      <div className="card-desc">Stealth / rate anomalies</div>
+                    </div>
+                    <div className="card card-success">
+                      <div className="card-header">
+                        <span className="card-label">Normal Nodes</span>
+                        <div className="card-icon"><CheckCircle size={16} /></div>
+                      </div>
+                      <div className="card-value">{report.summary.normal_ips}</div>
+                      <div className="card-desc">Within baseline parameters</div>
+                    </div>
+                  </div>
+                </section>
 
-                        {/* Rule Trigger Reasons */}
-                        <div style={{ marginBottom: 14 }}>
-                          <div className="section-label" style={{ marginBottom: 8 }}>Rule Trigger Explanations</div>
-                          <div className="callout callout-critical" style={{ padding: '10px 12px' }}>
-                            <div className="reason-list">
-                              {selectedHost.reason?.split('; ').map((r, i) => (
-                                <div key={i} className="reason-item">
-                                  <div className="reason-dot" />
-                                  <span>{r}</span>
-                                </div>
-                              ))}
+                {/* ---- CHARTS ---- */}
+                <section className="section-gap">
+                  <div className="section-header">
+                    <div>
+                      <div className="section-title">
+                        <div className="section-title-dot" style={{ background: 'var(--color-purple)' }} />
+                        Analytics
+                      </div>
+                    </div>
+                  </div>
+                  <div className="charts-grid">
+                    <div className="chart-card">
+                      <div className="chart-title">Threat Level Breakdown</div>
+                      <div className="chart-subtitle">Severity distribution across all hosts</div>
+                      <div className="chart-wrapper" style={{ height: 240 }}>
+                        <Doughnut data={doughnutData} options={doughnutOptions} />
+                      </div>
+                    </div>
+                    <div className="chart-card">
+                      <div className="chart-title">Top Suspicious Source IPs</div>
+                      <div className="chart-subtitle">Connection volume & unique ports targeted</div>
+                      <div className="chart-wrapper" style={{ height: 260 }}>
+                        <Bar data={barData} options={barOptions} />
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ---- HOST DIRECTORY + INSPECTOR ---- */}
+                <section className="section-gap">
+                  <div className="section-header">
+                    <div>
+                      <div className="section-title">
+                        <div className="section-title-dot" style={{ background: 'var(--color-critical)' }} />
+                        Port Scan Detection Center
+                      </div>
+                      <div className="section-subtitle">Click any host to run threat explainability & AI co-pilot analysis</div>
+                    </div>
+                    <div className="filter-bar">
+                      <div className="search-box">
+                        <Search size={13} className="search-box-icon" />
+                        <input
+                          type="text"
+                          placeholder="Search IP address..."
+                          value={searchTerm}
+                          onChange={e => setSearchTerm(e.target.value)}
+                          className="search-input"
+                        />
+                      </div>
+                      <select value={severityFilter} onChange={e => setSeverityFilter(e.target.value)} className="filter-select">
+                        <option value="ALL">All Severities</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Info">Normal</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="content-grid">
+                    {/* TABLE */}
+                    <div>
+                      <div className="data-table-wrap">
+                        <table className="data-table">
+                          <thead>
+                            <tr>
+                              <th style={{ width: '40px', textAlign: 'center', color: 'var(--text-tertiary)' }}>#</th>
+                              <th className="sortable-th" onClick={() => handleSort('source_ip')}>
+                                Source IP <SortIcon col="source_ip" />
+                              </th>
+                              <th className="sortable-th" style={{ textAlign: 'center' }} onClick={() => handleSort('total_connections')}>
+                                Conns <SortIcon col="total_connections" />
+                              </th>
+                              <th className="sortable-th" style={{ textAlign: 'center' }} onClick={() => handleSort('unique_destinations')}>
+                                Dst IPs <SortIcon col="unique_destinations" />
+                              </th>
+                              <th className="sortable-th" style={{ textAlign: 'center' }} onClick={() => handleSort('unique_ports')}>
+                                Ports <SortIcon col="unique_ports" />
+                              </th>
+                              <th style={{ textAlign: 'center' }}>Severity</th>
+                              <th>Classification</th>
+                              <th style={{ textAlign: 'right' }}>Inspect</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sortedFilteredHosts.length > 0 ? sortedFilteredHosts.map((host, idx) => (
+                              <tr
+                                key={host.source_ip}
+                                onClick={() => setSelectedIp(host.source_ip)}
+                                className={selectedIp === host.source_ip ? 'active' : ''}
+                              >
+                                <td className="num-cell" style={{ opacity: 0.5, borderRight: '1px solid var(--border-color)', width: '40px' }}>{idx + 1}</td>
+                                <td className="ip-cell">
+                                  {(host.severity === 'Critical' || host.severity === 'High') && (
+                                    <span className="threat-pulse" />
+                                  )}
+                                  {host.source_ip}
+                                </td>
+                                <td className="num-cell">{host.total_connections.toLocaleString()}</td>
+                                <td className="num-cell">{host.unique_destinations}</td>
+                                <td className="num-cell">{host.unique_ports}</td>
+                                <td style={{ textAlign: 'center' }}>
+                                  <span className={`badge badge-${host.severity.toLowerCase()}`}>
+                                    {host.severity}
+                                  </span>
+                                </td>
+                                <td className="mono" style={{
+                                  fontSize: 11.5,
+                                  color: host.classification?.includes('Distributed') ? 'var(--color-critical)' :
+                                    host.classification?.includes('Stealth') ? 'var(--color-warning)' :
+                                      host.classification?.includes('Vertical') ? 'var(--color-blue)' :
+                                        host.classification?.includes('Strobe') ? 'var(--color-purple)' :
+                                          'var(--text-secondary)'
+                                }}>
+                                  {host.classification}
+                                </td>
+                                <td style={{ textAlign: 'right' }}>
+                                  <button className="table-action-btn">
+                                    <ArrowRight size={13} />
+                                  </button>
+                                </td>
+                              </tr>
+                            )) : (
+                              <tr><td colSpan={8} style={{ textAlign: 'center', padding: '32px', color: 'var(--text-tertiary)', fontSize: 13 }}>
+                                No hosts matching your filters.
+                              </td></tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div style={{ marginTop: 10, display: 'flex', justifyContent: 'space-between', fontSize: 12, color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>
+                        <span>Showing {sortedFilteredHosts.length} of {report.hosts.length} hosts</span>
+                        <span>UNSW-NB15 Verified Ground-Truth Labels</span>
+                      </div>
+                    </div>
+
+                    {/* INSPECTOR PANEL */}
+                    <div className="inspector">
+                      {selectedHost ? (
+                        <>
+                          <div className="inspector-header">
+                            <div className="inspector-header-icon" style={{
+                              background: selectedHost.severity === 'Critical' ? 'var(--color-critical-bg)' :
+                                selectedHost.severity === 'High' ? 'var(--color-warning-bg)' :
+                                  selectedHost.severity === 'Medium' ? 'var(--color-warning-bg)' : 'var(--color-success-bg)',
+                              color: selectedHost.severity === 'Critical' ? 'var(--color-critical)' :
+                                selectedHost.severity === 'High' ? 'var(--color-warning)' :
+                                  selectedHost.severity === 'Medium' ? 'var(--color-warning)' : 'var(--color-success)'
+                            }}>
+                              <ShieldAlert size={16} />
+                            </div>
+                            <div>
+                              <div className="inspector-title">Threat Intelligence</div>
+                              <div className="inspector-sub">Host forensics & trigger analysis</div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Advanced Correlation */}
-                        {selectedHost.advanced_classification && selectedHost.advanced_classification !== 'Normal Traffic' && (
-                          <div style={{ marginBottom: 14 }}>
-                            <div className="section-label" style={{ marginBottom: 8 }}>Advanced Correlation</div>
-                            <div className="callout callout-purple" style={{ padding: '10px 12px' }}>
-                              <div className="callout-content">
-                                <div className="callout-title" style={{ color: 'var(--color-purple)', fontSize: 12 }}>
-                                  {selectedHost.advanced_classification}
-                                </div>
-                                <div className="callout-text" style={{ fontSize: 11.5 }}>{selectedHost.advanced_reason}</div>
+                          <div className="inspector-body">
+                            {/* Host ID Block */}
+                            <div className="info-block" style={{ marginBottom: 16 }}>
+                              <div className="info-row">
+                                <span className="info-label">Target Host</span>
+                                <span className="info-value">{selectedHost.source_ip}</span>
+                              </div>
+                              <div className="info-row">
+                                <span className="info-label">Threat Level</span>
+                                <span><span className={`badge badge-${selectedHost.severity.toLowerCase()}`}>{selectedHost.severity}</span></span>
+                              </div>
+                              <div className="info-row">
+                                <span className="info-label">Duration</span>
+                                <span className="info-value">{selectedHost.duration_sec}s</span>
+                              </div>
+                              <div className="info-row">
+                                <span className="info-label">Avg Rate</span>
+                                <span className="info-value">{selectedHost.conn_rate_per_sec}/s</span>
+                              </div>
+                              <div className="info-row" style={{ borderBottom: 'none' }}>
+                                <span className="info-label">Volume</span>
+                                <span className="info-value">{(selectedHost.total_bytes / 1024).toFixed(1)} KB</span>
                               </div>
                             </div>
-                          </div>
-                        )}
 
-                        {/* Connection States */}
-                        <div style={{ marginBottom: 14 }}>
-                          <div className="section-label" style={{ marginBottom: 8 }}>Connection State Breakdown</div>
-                          {Object.entries(selectedHost.states).slice(0, 5).map(([state, count]) => {
-                            const pct = (count / selectedHost.total_connections * 100);
-                            return (
-                              <div key={state} className="state-bar-item">
-                                <div className="state-bar-label">
-                                  <span>{state}</span>
-                                  <span>{count.toLocaleString()} ({pct.toFixed(0)}%)</span>
-                                </div>
-                                <div className="state-bar-track">
-                                  <div className="state-bar-fill" style={{
-                                    width: `${pct}%`,
-                                    background: state === 'FIN' ? 'var(--color-success)' :
-                                      state === 'CON' ? 'var(--color-blue)' :
-                                        state === 'INT' || state === 'REQ' || state === 'RST' ? 'var(--color-critical)' : 'var(--color-warning)'
-                                  }} />
+                            {/* Rule Trigger Reasons */}
+                            <div style={{ marginBottom: 14 }}>
+                              <div className="section-label" style={{ marginBottom: 8 }}>Rule Trigger Explanations</div>
+                              <div className="callout callout-critical" style={{ padding: '10px 12px' }}>
+                                <div className="reason-list">
+                                  {selectedHost.reason?.split('; ').map((r, i) => (
+                                    <div key={i} className="reason-item">
+                                      <div className="reason-dot" />
+                                      <span>{r}</span>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
+                            </div>
 
-                        {/* Protocols */}
-                        <div style={{ marginBottom: 16 }}>
-                          <div className="section-label" style={{ marginBottom: 6 }}>Active Protocols</div>
-                          <div className="chip-list">
-                            {selectedHost.protocols.slice(0, 10).map(p => (
-                              <span key={p} className="chip">{p.toUpperCase()}</span>
-                            ))}
-                            {selectedHost.protocols.length > 10 && (
-                              <span className="chip">+{selectedHost.protocols.length - 10} more</span>
+                            {/* Advanced Correlation */}
+                            {selectedHost.advanced_classification && selectedHost.advanced_classification !== 'Normal Traffic' && (
+                              <div style={{ marginBottom: 14 }}>
+                                <div className="section-label" style={{ marginBottom: 8 }}>Advanced Correlation</div>
+                                <div className="callout callout-purple" style={{ padding: '10px 12px' }}>
+                                  <div className="callout-content">
+                                    <div className="callout-title" style={{ color: 'var(--color-purple)', fontSize: 12 }}>
+                                      {selectedHost.advanced_classification}
+                                    </div>
+                                    <div className="callout-text" style={{ fontSize: 11.5 }}>{selectedHost.advanced_reason}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Connection States */}
+                            <div style={{ marginBottom: 14 }}>
+                              <div className="section-label" style={{ marginBottom: 8 }}>Connection State Breakdown</div>
+                              {Object.entries(selectedHost.states).slice(0, 5).map(([state, count]) => {
+                                const pct = (count / selectedHost.total_connections * 100);
+                                return (
+                                  <div key={state} className="state-bar-item">
+                                    <div className="state-bar-label">
+                                      <span>{state}</span>
+                                      <span>{count.toLocaleString()} ({pct.toFixed(0)}%)</span>
+                                    </div>
+                                    <div className="state-bar-track">
+                                      <div className="state-bar-fill" style={{
+                                        width: `${pct}%`,
+                                        background: state === 'FIN' ? 'var(--color-success)' :
+                                          state === 'CON' ? 'var(--color-blue)' :
+                                            state === 'INT' || state === 'REQ' || state === 'RST' ? 'var(--color-critical)' : 'var(--color-warning)'
+                                      }} />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* Protocols */}
+                            <div style={{ marginBottom: 16 }}>
+                              <div className="section-label" style={{ marginBottom: 6 }}>Active Protocols</div>
+                              <div className="chip-list">
+                                {selectedHost.protocols.slice(0, 10).map(p => (
+                                  <span key={p} className="chip">{p.toUpperCase()}</span>
+                                ))}
+                                {selectedHost.protocols.length > 10 && (
+                                  <span className="chip">+{selectedHost.protocols.length - 10} more</span>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* AI CO-PILOT */}
+                            {aiAnalysis && (
+                              <div className="ai-copilot">
+                                <div className="ai-copilot-header">
+                                  <div className="ai-copilot-icon">🤖</div>
+                                  <span className="ai-copilot-title">AI Security</span>
+                                  <span className="ai-copilot-badge">Rule-Based</span>
+                                </div>
+                                <div className="ai-copilot-body">
+                                  <div className="ai-insight">
+                                    <div className="ai-insight-icon" style={{ background: 'var(--color-blue-bg)', color: 'var(--color-blue)' }}>🔍</div>
+                                    <div className="ai-insight-content">
+                                      <div className="ai-insight-label">Attack Explanation</div>
+                                      <div className="ai-insight-text">{aiAnalysis.attackExplanation}</div>
+                                    </div>
+                                  </div>
+                                  <div className="ai-insight">
+                                    <div className="ai-insight-icon" style={{ background: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}>⚠️</div>
+                                    <div className="ai-insight-content">
+                                      <div className="ai-insight-label">Threat Prediction</div>
+                                      <div className="ai-insight-text">{aiAnalysis.prediction}</div>
+                                    </div>
+                                  </div>
+                                  <div className="ai-insight">
+                                    <div className="ai-insight-icon" style={{ background: 'var(--color-success-bg)', color: 'var(--color-success)' }}>🛡️</div>
+                                    <div className="ai-insight-content">
+                                      <div className="ai-insight-label">Mitigation Rule</div>
+                                      <MitigationBlock command={aiAnalysis.mitigation} />
+                                    </div>
+                                  </div>
+                                  <div className="ai-insight">
+                                    <div className="ai-insight-icon" style={{ background: 'var(--color-purple-bg)', color: 'var(--color-purple)' }}>📋</div>
+                                    <div className="ai-insight-content">
+                                      <div className="ai-insight-label">Incident Summary</div>
+                                      <div className="ai-insight-text">{aiAnalysis.summary}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             )}
                           </div>
+                        </>
+                      ) : (
+                        <div className="inspector-empty">
+                          <Eye size={36} className="inspector-empty-icon" />
+                          <p className="inspector-empty-text">No host selected.<br />Click any row to inspect threat details and AI analysis.</p>
                         </div>
-
-                        {/* AI CO-PILOT */}
-                        {aiAnalysis && (
-                          <div className="ai-copilot">
-                            <div className="ai-copilot-header">
-                              <div className="ai-copilot-icon">🤖</div>
-                              <span className="ai-copilot-title">AI Security</span>
-                              <span className="ai-copilot-badge">Rule-Based</span>
-                            </div>
-                            <div className="ai-copilot-body">
-                              <div className="ai-insight">
-                                <div className="ai-insight-icon" style={{ background: 'var(--color-blue-bg)', color: 'var(--color-blue)' }}>🔍</div>
-                                <div className="ai-insight-content">
-                                  <div className="ai-insight-label">Attack Explanation</div>
-                                  <div className="ai-insight-text">{aiAnalysis.attackExplanation}</div>
-                                </div>
-                              </div>
-                              <div className="ai-insight">
-                                <div className="ai-insight-icon" style={{ background: 'var(--color-warning-bg)', color: 'var(--color-warning)' }}>⚠️</div>
-                                <div className="ai-insight-content">
-                                  <div className="ai-insight-label">Threat Prediction</div>
-                                  <div className="ai-insight-text">{aiAnalysis.prediction}</div>
-                                </div>
-                              </div>
-                              <div className="ai-insight">
-                                <div className="ai-insight-icon" style={{ background: 'var(--color-success-bg)', color: 'var(--color-success)' }}>🛡️</div>
-                                <div className="ai-insight-content">
-                                  <div className="ai-insight-label">Mitigation Rule</div>
-                                  <MitigationBlock command={aiAnalysis.mitigation} />
-                                </div>
-                              </div>
-                              <div className="ai-insight">
-                                <div className="ai-insight-icon" style={{ background: 'var(--color-purple-bg)', color: 'var(--color-purple)' }}>📋</div>
-                                <div className="ai-insight-content">
-                                  <div className="ai-insight-label">Incident Summary</div>
-                                  <div className="ai-insight-text">{aiAnalysis.summary}</div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="inspector-empty">
-                      <Eye size={36} className="inspector-empty-icon" />
-                      <p className="inspector-empty-text">No host selected.<br />Click any row to inspect threat details and AI analysis.</p>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {/* ---- EXPORT BAR ---- */}
-            <div className="export-bar">
-              <div className="export-bar-left">
-                <div className="export-bar-title">Threat Report Export Center</div>
-                <div className="export-bar-desc">Download official threat reports for security compliance, firewall policies, or forensic archives.</div>
-              </div>
-              <div className="export-bar-actions">
-                <button onClick={downloadCSV} className="btn btn-default">
-                  <Download size={14} /> Download CSV
-                </button>
-                <button onClick={downloadPDF} className="btn btn-primary">
-                  <FileText size={14} /> Print PDF Report
-                </button>
-              </div>
-            </div>
-
-            {/* ---- INFO CARDS ---- */}
-            <section className="section-gap">
-              <div className="info-cards-grid">
-                <div className="info-card">
-                  <div className="info-card-header">
-                    <div className="info-card-icon" style={{ background: 'var(--color-blue-bg)', color: 'var(--color-blue)' }}><Cpu size={15} /></div>
-                    <div className="info-card-title">State Tracking Engine</div>
                   </div>
-                  <div className="info-card-text">
-                    Constructs a real-time sliding window of traffic metadata to classify threats with high explainability.
-                    <br /><br />
-                    <strong>Vertical Scan</strong> — ≥ 20 ports on one host. <strong>Horizontal Scan</strong> — ≥ 30 target hosts.
-                    <strong> Strobe Scan</strong> — Multiple hosts × multiple ports simultaneously.
+                </section>
+
+                {/* ---- EXPORT BAR ---- */}
+                <div className="export-bar">
+                  <div className="export-bar-left">
+                    <div className="export-bar-title">Threat Report Export Center</div>
+                    <div className="export-bar-desc">Download official threat reports for security compliance, firewall policies, or forensic archives.</div>
+                  </div>
+                  <div className="export-bar-actions">
+                    <button onClick={downloadCSV} className="btn btn-default">
+                      <Download size={14} /> Download CSV
+                    </button>
+                    <button onClick={downloadPDF} className="btn btn-primary">
+                      <FileText size={14} /> Print PDF Report
+                    </button>
                   </div>
                 </div>
-                <div className="info-card">
-                  <div className="info-card-header">
-                    <div className="info-card-icon" style={{ background: 'var(--color-success-bg)', color: 'var(--color-success)' }}><Database size={15} /></div>
-                    <div className="info-card-title">Dataset Validation</div>
-                  </div>
-                  <div className="info-card-text">
-                    Analyzing the <strong>UNSW-NB15</strong> benchmark Netflow partition. The engine processes mixed data types, cleans string formatting, and parses hexadecimal ports.
-                    <br /><br />
-                    Ground-truth threat categories (Backdoor, Exploits, Generic) are cross-referenced directly from raw CSV labels.
-                  </div>
-                </div>
-                <div className="info-card">
-                  <div className="info-card-header">
-                    <div className="info-card-icon" style={{ background: 'var(--color-purple-bg)', color: 'var(--color-purple)' }}><Zap size={15} /></div>
-                    <div className="info-card-title">Advanced Correlation Engine</div>
-                  </div>
-                  <div className="info-card-text">
-                    Detects stealth attack vectors that bypass simple threshold rules.
-                    <br /><br />
-                    <strong>Distributed Campaigns</strong> — Cross-IP coordinated probes. <strong>Slow Scans</strong> — Low-rate long-duration port sweeps. <strong>Benign Profiling</strong> — Filters high-payload services to reduce false alarms.
-                  </div>
-                </div>
-              </div>
-            </section>
 
-          </div> {/* end page-content */}
+                {/* ---- INFO CARDS ---- */}
+                <section className="section-gap">
+                  <div className="info-cards-grid">
+                    <div className="info-card">
+                      <div className="info-card-header">
+                        <div className="info-card-icon" style={{ background: 'var(--color-blue-bg)', color: 'var(--color-blue)' }}><Cpu size={15} /></div>
+                        <div className="info-card-title">State Tracking Engine</div>
+                      </div>
+                      <div className="info-card-text">
+                        Constructs a real-time sliding window of traffic metadata to classify threats with high explainability.
+                        <br /><br />
+                        <strong>Vertical Scan</strong> — ≥ 20 ports on one host. <strong>Horizontal Scan</strong> — ≥ 30 target hosts.
+                        <strong> Strobe Scan</strong> — Multiple hosts × multiple ports simultaneously.
+                      </div>
+                    </div>
+                    <div className="info-card">
+                      <div className="info-card-header">
+                        <div className="info-card-icon" style={{ background: 'var(--color-success-bg)', color: 'var(--color-success)' }}><Database size={15} /></div>
+                        <div className="info-card-title">Dataset Validation</div>
+                      </div>
+                      <div className="info-card-text">
+                        Analyzing the <strong>UNSW-NB15</strong> benchmark Netflow partition. The engine processes mixed data types, cleans string formatting, and parses hexadecimal ports.
+                        <br /><br />
+                        Ground-truth threat categories (Backdoor, Exploits, Generic) are cross-referenced directly from raw CSV labels.
+                      </div>
+                    </div>
+                    <div className="info-card">
+                      <div className="info-card-header">
+                        <div className="info-card-icon" style={{ background: 'var(--color-purple-bg)', color: 'var(--color-purple)' }}><Zap size={15} /></div>
+                        <div className="info-card-title">Advanced Correlation Engine</div>
+                      </div>
+                      <div className="info-card-text">
+                        Detects stealth attack vectors that bypass simple threshold rules.
+                        <br /><br />
+                        <strong>Distributed Campaigns</strong> — Cross-IP coordinated probes. <strong>Slow Scans</strong> — Low-rate long-duration port sweeps. <strong>Benign Profiling</strong> — Filters high-payload services to reduce false alarms.
+                      </div>
+                    </div>
+                  </div>
+                </section>
 
-          {/* ============================================================
+              </div> {/* end page-content */}
+
+              {/* ============================================================
             PRINT-ONLY REPORT
             ============================================================ */}
-          <div className="print-only-report">
-            <div className="print-header">
-              <div>
-                <h1>THE NETWORK BOUNCER</h1>
-                <p>NIDS Sliding-Window Threat Analysis Report</p>
-              </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontWeight: 'bold', margin: 0 }}>Date: {new Date().toLocaleDateString()}</p>
-                <p style={{ margin: 0 }}>Dataset: {report.dataset_name ? report.dataset_name.split(/[/\\]/).pop() : 'N/A'}</p>
-              </div>
-            </div>
+              <div className="print-only-report">
+                <div className="print-header">
+                  <div>
+                    <h1>THE NETWORK BOUNCER</h1>
+                    <p>NIDS Sliding-Window Threat Analysis Report</p>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <p style={{ fontWeight: 'bold', margin: 0 }}>Date: {new Date().toLocaleDateString()}</p>
+                    <p style={{ margin: 0 }}>Dataset: {report.dataset_name ? report.dataset_name.split(/[/\\]/).pop() : 'N/A'}</p>
+                  </div>
+                </div>
 
-            <div className="print-meta-grid">
-              <div className="print-meta-card">
-                <h3>Total Hosts</h3>
-                <p>{report.summary.total_ips}</p>
+                <div className="print-meta-grid">
+                  <div className="print-meta-card">
+                    <h3>Total Hosts</h3>
+                    <p>{report.summary.total_ips}</p>
+                  </div>
+                  <div className="print-meta-card" style={{ borderLeft: '3px solid #EF4444' }}>
+                    <h3>Suspicious Hosts</h3>
+                    <p>{report.summary.suspicious_ips}</p>
+                  </div>
+                  <div className="print-meta-card" style={{ borderLeft: '3px solid #F59E0B' }}>
+                    <h3>High / Critical</h3>
+                    <p>{(report.summary.severity_distribution.Critical || 0) + (report.summary.severity_distribution.High || 0)}</p>
+                  </div>
+                  <div className="print-meta-card" style={{ borderLeft: '3px solid #10B981' }}>
+                    <h3>Normal Hosts</h3>
+                    <p>{report.summary.normal_ips}</p>
+                  </div>
+                </div>
+
+                <h2 className="print-section-title">Severity Distribution</h2>
+                <table className="print-table">
+                  <thead><tr>
+                    <th style={{ width: '30%' }}>Severity Level</th>
+                    <th>Count</th>
+                  </tr></thead>
+                  <tbody>
+                    <tr><td><span className="print-badge print-badge-critical">Critical</span></td><td>{report.summary.severity_distribution.Critical || 0} hosts</td></tr>
+                    <tr><td><span className="print-badge print-badge-high">High</span></td><td>{report.summary.severity_distribution.High || 0} hosts</td></tr>
+                    <tr><td><span className="print-badge print-badge-medium">Medium</span></td><td>{report.summary.severity_distribution.Medium || 0} hosts</td></tr>
+                    <tr><td><span className="print-badge print-badge-normal">Normal</span></td><td>{report.summary.severity_distribution.Normal || 0} hosts</td></tr>
+                  </tbody>
+                </table>
+
+                <div className="page-break" />
+
+                <h2 className="print-section-title">Suspicious Traffic &amp; Threat Signatures</h2>
+                <table className="print-table">
+                  <thead><tr>
+                    <th style={{ width: '18%' }}>Source IP</th>
+                    <th style={{ width: '10%', textAlign: 'center' }}>Conns</th>
+                    <th style={{ width: '10%', textAlign: 'center' }}>Ports</th>
+                    <th style={{ width: '14%' }}>Severity</th>
+                    <th style={{ width: '48%' }}>Detection Reasoning</th>
+                  </tr></thead>
+                  <tbody>
+                    {report.hosts?.filter(h => h.is_suspicious).length > 0 ? (
+                      report.hosts.filter(h => h.is_suspicious).map(host => (
+                        <tr key={host.source_ip} className="no-break">
+                          <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{host.source_ip}</td>
+                          <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.total_connections.toLocaleString()}</td>
+                          <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.unique_ports}</td>
+                          <td><span className={`print-badge print-badge-${host.severity.toLowerCase()}`}>{host.severity}</span></td>
+                          <td>{host.reason || 'Normal traffic behavior'}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr><td colSpan="5" style={{ textAlign: 'center' }}>No suspicious hosts detected.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+
+                <footer style={{ marginTop: '3rem', borderTop: '1px solid #E5E7EB', paddingTop: '1rem', fontSize: '8pt', color: '#9ca3af', textAlign: 'center' }}>
+                  This report was generated by The Network Bouncer NIDS. Copyright &copy; {new Date().getFullYear()}. All rights reserved.
+                </footer>
               </div>
-              <div className="print-meta-card" style={{ borderLeft: '3px solid #EF4444' }}>
-                <h3>Suspicious Hosts</h3>
-                <p>{report.summary.suspicious_ips}</p>
-              </div>
-              <div className="print-meta-card" style={{ borderLeft: '3px solid #F59E0B' }}>
-                <h3>High / Critical</h3>
-                <p>{(report.summary.severity_distribution.Critical || 0) + (report.summary.severity_distribution.High || 0)}</p>
-              </div>
-              <div className="print-meta-card" style={{ borderLeft: '3px solid #10B981' }}>
-                <h3>Normal Hosts</h3>
-                <p>{report.summary.normal_ips}</p>
-              </div>
-            </div>
 
-            <h2 className="print-section-title">Severity Distribution</h2>
-            <table className="print-table">
-              <thead><tr>
-                <th style={{ width: '30%' }}>Severity Level</th>
-                <th>Count</th>
-              </tr></thead>
-              <tbody>
-                <tr><td><span className="print-badge print-badge-critical">Critical</span></td><td>{report.summary.severity_distribution.Critical || 0} hosts</td></tr>
-                <tr><td><span className="print-badge print-badge-high">High</span></td><td>{report.summary.severity_distribution.High || 0} hosts</td></tr>
-                <tr><td><span className="print-badge print-badge-medium">Medium</span></td><td>{report.summary.severity_distribution.Medium || 0} hosts</td></tr>
-                <tr><td><span className="print-badge print-badge-normal">Normal</span></td><td>{report.summary.severity_distribution.Normal || 0} hosts</td></tr>
-              </tbody>
-            </table>
-
-            <div className="page-break" />
-
-            <h2 className="print-section-title">Suspicious Traffic &amp; Threat Signatures</h2>
-            <table className="print-table">
-              <thead><tr>
-                <th style={{ width: '18%' }}>Source IP</th>
-                <th style={{ width: '10%', textAlign: 'center' }}>Conns</th>
-                <th style={{ width: '10%', textAlign: 'center' }}>Ports</th>
-                <th style={{ width: '14%' }}>Severity</th>
-                <th style={{ width: '48%' }}>Detection Reasoning</th>
-              </tr></thead>
-              <tbody>
-                {report.hosts?.filter(h => h.is_suspicious).length > 0 ? (
-                  report.hosts.filter(h => h.is_suspicious).map(host => (
-                    <tr key={host.source_ip} className="no-break">
-                      <td style={{ fontFamily: 'monospace', fontWeight: 'bold' }}>{host.source_ip}</td>
-                      <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.total_connections.toLocaleString()}</td>
-                      <td style={{ textAlign: 'center', fontFamily: 'monospace' }}>{host.unique_ports}</td>
-                      <td><span className={`print-badge print-badge-${host.severity.toLowerCase()}`}>{host.severity}</span></td>
-                      <td>{host.reason || 'Normal traffic behavior'}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr><td colSpan="5" style={{ textAlign: 'center' }}>No suspicious hosts detected.</td></tr>
-                )}
-              </tbody>
-            </table>
-
-            <footer style={{ marginTop: '3rem', borderTop: '1px solid #E5E7EB', paddingTop: '1rem', fontSize: '8pt', color: '#9ca3af', textAlign: 'center' }}>
-              This report was generated by The Network Bouncer NIDS. Copyright &copy; {new Date().getFullYear()}. All rights reserved.
-            </footer>
-          </div>
-
-          </>
+            </>
           )} {/* end currentPage === 'dashboard' */}
 
         </div> {/* end main-content */}
