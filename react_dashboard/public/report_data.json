@@ -370,7 +370,7 @@
       "severity": "High",
       "reason": "Labeled attack traffic in dataset (50 flows)",
       "advanced_classification": "Distributed Scan Campaign",
-      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.1', '10.100.0.9', '10.100.0.2'])",
       "labeled_attacks_count": 50,
       "true_attack_cat": "exploits"
     },
@@ -400,7 +400,7 @@
       "severity": "High",
       "reason": "Labeled attack traffic in dataset (50 flows)",
       "advanced_classification": "Distributed Scan Campaign",
-      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.1', '10.100.0.9', '10.100.0.2'])",
       "labeled_attacks_count": 50,
       "true_attack_cat": "exploits"
     },
@@ -430,7 +430,7 @@
       "severity": "High",
       "reason": "Labeled attack traffic in dataset (50 flows)",
       "advanced_classification": "Distributed Scan Campaign",
-      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.1', '10.100.0.9', '10.100.0.2'])",
       "labeled_attacks_count": 50,
       "true_attack_cat": "exploits"
     },
@@ -890,7 +890,7 @@
       "severity": "High",
       "reason": "Labeled attack traffic in dataset (50 flows)",
       "advanced_classification": "Distributed Scan Campaign",
-      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.1', '10.100.0.9', '10.100.0.2'])",
       "labeled_attacks_count": 50,
       "true_attack_cat": "exploits"
     },
@@ -920,7 +920,7 @@
       "severity": "High",
       "reason": "Labeled attack traffic in dataset (50 flows)",
       "advanced_classification": "Distributed Scan Campaign",
-      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.1', '10.100.0.9', '10.100.0.2'])",
       "labeled_attacks_count": 50,
       "true_attack_cat": "exploits"
     },
@@ -950,7 +950,7 @@
       "severity": "High",
       "reason": "Labeled attack traffic in dataset (50 flows)",
       "advanced_classification": "Distributed Scan Campaign",
-      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.2', '10.100.0.3', '10.100.0.7'])",
+      "advanced_reason": "Distributed Scan: Coordinated probe against target ports across 50 destinations (Targets: ['10.100.0.1', '10.100.0.9', '10.100.0.2'])",
       "labeled_attacks_count": 50,
       "true_attack_cat": "exploits"
     }
