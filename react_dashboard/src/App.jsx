@@ -261,7 +261,133 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  const downloadPDF = () => window.print();
+  const downloadPDF = () => {
+    if (!report) return;
+    const date = new Date().toLocaleString();
+    const sevColor = { Critical: '#dc2626', High: '#ea580c', Medium: '#d97706', Normal: '#059669' };
+    const sevBg    = { Critical: '#fef2f2', High: '#fff7ed', Medium: '#fffbeb', Normal: '#f0fdf4' };
+
+    const suspRows = report.hosts
+      .filter(h => h.is_suspicious)
+      .sort((a, b) => {
+        const order = { Critical: 0, High: 1, Medium: 2, Normal: 3 };
+        return (order[a.severity] ?? 4) - (order[b.severity] ?? 4);
+      });
+
+    const tableRows = suspRows.map(h => `
+      <tr>
+        <td style="font-family:monospace;font-weight:600;color:#111">${h.source_ip}</td>
+        <td style="text-align:center">${h.total_connections.toLocaleString()}</td>
+        <td style="text-align:center">${h.unique_destinations}</td>
+        <td style="text-align:center">${h.unique_ports}</td>
+        <td style="text-align:center">
+          <span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;
+            color:${sevColor[h.severity] || '#374151'};background:${sevBg[h.severity] || '#f9fafb'}">
+            ${h.severity}
+          </span>
+        </td>
+        <td style="font-size:12px;color:#374151">${(h.reason || 'Normal traffic behavior').substring(0, 120)}</td>
+      </tr>`).join('');
+
+    const dist = report.summary.severity_distribution;
+    const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Network Bouncer Report — ${report.dataset_name}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; color: #111827; background: #fff; padding: 32px 40px; font-size: 13px; }
+    h1 { font-size: 22px; font-weight: 800; color: #111; letter-spacing: -0.5px; }
+    h2 { font-size: 14px; font-weight: 700; color: #374151; margin: 24px 0 10px; border-bottom: 2px solid #e5e7eb; padding-bottom: 6px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #111; }
+    .header-right { text-align: right; font-size: 12px; color: #6b7280; }
+    .meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .meta-card { padding: 14px 16px; border-radius: 8px; border: 1px solid #e5e7eb; }
+    .meta-card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 6px; }
+    .meta-card p { font-size: 26px; font-weight: 800; color: #111; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #f9fafb; padding: 9px 10px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
+    td { padding: 9px 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    tr:nth-child(even) td { background: #fafafa; }
+    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #9ca3af; text-align: center; }
+    @media print {
+      body { padding: 16px 20px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>🛡️ Network Bouncer NIDS</h1>
+      <div style="font-size:13px;color:#6b7280;margin-top:4px">Sliding-Window Threat Analysis Report</div>
+    </div>
+    <div class="header-right">
+      <div><strong>Generated:</strong> ${date}</div>
+      <div><strong>Dataset:</strong> ${report.dataset_name}</div>
+      <div><strong>Engine:</strong> In-Browser NIDS v2.0</div>
+    </div>
+  </div>
+
+  <div class="meta-grid">
+    <div class="meta-card" style="border-left:4px solid #6b7280">
+      <h3>Total Hosts</h3>
+      <p>${report.summary.total_ips}</p>
+    </div>
+    <div class="meta-card" style="border-left:4px solid #dc2626">
+      <h3>Suspicious</h3>
+      <p style="color:#dc2626">${report.summary.suspicious_ips}</p>
+    </div>
+    <div class="meta-card" style="border-left:4px solid #ea580c">
+      <h3>Critical + High</h3>
+      <p style="color:#ea580c">${(dist.Critical || 0) + (dist.High || 0)}</p>
+    </div>
+    <div class="meta-card" style="border-left:4px solid #059669">
+      <h3>Normal</h3>
+      <p style="color:#059669">${report.summary.normal_ips}</p>
+    </div>
+  </div>
+
+  <h2>Severity Breakdown</h2>
+  <table style="width:auto;margin-bottom:20px">
+    <thead><tr><th>Severity</th><th>Count</th></tr></thead>
+    <tbody>
+      <tr><td><span style="color:#dc2626;font-weight:700">● Critical</span></td><td>${dist.Critical || 0}</td></tr>
+      <tr><td><span style="color:#ea580c;font-weight:700">● High</span></td><td>${dist.High || 0}</td></tr>
+      <tr><td><span style="color:#d97706;font-weight:700">● Medium</span></td><td>${dist.Medium || 0}</td></tr>
+      <tr><td><span style="color:#059669;font-weight:700">● Normal</span></td><td>${dist.Normal || 0}</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Suspicious Hosts — Full Report (${suspRows.length} flagged)</h2>
+  ${suspRows.length > 0 ? `
+  <table>
+    <thead>
+      <tr>
+        <th>Source IP</th><th>Conns</th><th>Dsts</th><th>Ports</th>
+        <th>Severity</th><th>Detection Reason</th>
+      </tr>
+    </thead>
+    <tbody>${tableRows}</tbody>
+  </table>` : '<p style="color:#6b7280;padding:16px 0">No suspicious hosts detected in this dataset.</p>'}
+
+  <div class="footer">
+    This report was generated by The Network Bouncer NIDS &mdash; In-Browser Analysis Engine &mdash;
+    &copy; ${new Date().getFullYear()}. All rights reserved.
+  </div>
+  <script>window.onload = () => { window.focus(); window.print(); };</script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) {
+      alert('Pop-up blocked. Please allow pop-ups for this site and try again.');
+      return;
+    }
+    win.document.write(html);
+    win.document.close();
+  };
 
   /* ---- LOADING STATE ---- */
   if (loading) return (
